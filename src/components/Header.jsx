@@ -16,12 +16,12 @@ const Header = ({title, subtitle, logo})=>{
     return (
     <Row style={style} options="middle-xs between-md around-xs">
         <Col>
-            <Box options="center-xs start-sm" >
+            <Box options="center-xs start-sm hidden-xs show-sm" >
                 <img src={logo} alt={title} height="70px" />
             </Box>
         </Col>
         <Col>
-            <Box options="center-xs end-sm">
+            <Box options="center-xs end-sm ">
                 <h3 style={{fontWeight: 500}}>{title}</h3>
                 <h4 style={{fontWeight: 300}}>{subtitle}</h4>
             </Box>

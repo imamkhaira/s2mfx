@@ -94,10 +94,10 @@ export const Section = props => {
 }
 
 
-export const TextField = ({label, bindTo, debug, ...rest}) =>{
+export const TextField = ({label, bindTo, varName, ...rest}) =>{
   const handleInput = (event) =>{
     let value = event.target.value;
-    debug ? window.s2mfx[debug] = value: bindTo.setValue(event.target.value);
+    typeof(bindTo)==='object' ? bindTo.setValue(event.target.value) : window.s2mfx[varName] = value;
   }
   return (
     <MS.TextField label={label} onChange={handleInput}/>

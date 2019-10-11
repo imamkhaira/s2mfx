@@ -41,6 +41,10 @@
   flex-direction: column-reverse;
 }
 
+.hidden-xs {
+  display:none;
+}
+
 .col-xs,
 .col-xs-1,
 .col-xs-2,
@@ -267,6 +271,12 @@
 }
 
 @media only screen and (min-width: 48em) {
+  .show-sm {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+  }
+
   .container {
     width: 49rem;
   }
