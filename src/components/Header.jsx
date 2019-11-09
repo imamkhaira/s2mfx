@@ -11,7 +11,6 @@ const Header = ({title, subtitle, logo})=>{
         border: '1px solid #064a90',
         lineHeight: '4px',
     };
-    const red = { backgroundColor:"red"};
 
     return (
     <Row style={style} options="middle-xs between-md around-xs">
