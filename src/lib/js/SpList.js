@@ -1,44 +1,40 @@
-//const sprLib = window.sprlib;
+const sprLib = window.sprLib;
+// sprLib.baseUrl("/PDS/");
 
-class SpList {
-    constructor(GUID){
-        this.list = sprLib.list(GUID);
-        this.cols = {};
-        this.list.cols().then(cols=>{
-            cols.forEach(col => {
-                col.value = null;
-                col.setValue = (value)=>{ col.value = value };
-                this.cols[col.dataName] = col;
-            });
-            this.list.info().then(info=>{
-                for (const key in info) this[key] = info[key];
-                console.log(`list ${this.Title} is redy.`)
-            });
-            SpList.currentUser = SpList.currentUser || sprLib.user().info().then(user=>{ SpList.currentUser = user});
-        }).catch(err=>console.log(err));
-    }
+const SpList = async GUID => {
+    const list = sprLib.list(GUID);
+    let columns = await list.cols();
+    let listObj = {};
+    columns.forEach(column => {
+        column.value = undefined;
+        column.setValue = newValue => { column.value = newValue; console.log(column.value); }
+        listObj[column.dataName] = column;
+    });
 
-    printInfo(){
-        console.log(`Title: ${this.Title}, GUID: ${this.Id}, No. of items: ${this.ItemCount}`);
-        console.table(this.cols, ['dispName', 'isRequired', 'dataType', 'choiceValues']);
-    }
-
-    submitAction(){
-        let values = {};
-        for (const key in this.cols) {
-            if (this.cols[key].value) values[key] = this.cols[key].value;
-        };
-        console.log(values);
-        this.list.create(values).then(resp=>{
-            alert(`Submit Successfull`);
-            console.log('Successfully sumbitted following data:');
-            console.table([resp]);
-        }).catch(resp=>{
-            alert(`Submit failed`);
-            console.log('Submit failed');
-            console.log(resp);
+    listObj.submitAction = () =>{
+        let toSubmit = {};
+        for (const key in listObj) {
+            if (listObj[key].maxLength && !listObj[key].isReadOnly) {
+                toSubmit[key] = listObj[key].value;
+            }
+        }
+        list.create(toSubmit).then(result=>{
+            alert(`Submitted successfully `);
+            console.log(`SUCCESS submit with message: ${result} `);
+            return true;
         })
+        .catch(e=>{
+            alert(`submit failed: ${e}`);
+            console.error(`failed to submit: ${e}`);
+            return false;
+        });
     }
+    return listObj;
 }
 
-const b = new SpList('bc83b8cb-9335-4f74-88ed-7961872b52b1');
+const getDataName = () =>{
+
+}
+
+// const b = await SpList("99bb42f1-e5ca-46de-8f40-63499c445fc6");
+export default SpList;

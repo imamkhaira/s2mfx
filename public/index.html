@@ -25,6 +25,14 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script>
+      if(window.SP){
+        if(!window.sprLib){
+          console.log("ga ada cdn, using fallback to local server");
+          document.write('<script src="%PUBLIC_URL%/static/js/MicrosoftAjax.js">\x3C/script>');
+        }
+      } else {console.log("not deployed in sharepoint yet?");}
+    </script>
     <style>
     body {
       font-family:'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif';

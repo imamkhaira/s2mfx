@@ -1,0 +1,102 @@
+// export class Tabulator extends React.Component{
+//   constructor(props){
+//     super(props);
+//     this.cells=[];
+//     this.headers=[];
+//     this.cols={};
+//     // this piece iterates all child element, then breaks it into an array of label
+//     // and an array of cloned and modified element
+//     if (this.props.children.length > 1){
+//       this.props.children.forEach(child => {
+//         const key=child.props.label;
+//         this.cols[key] = [];
+//         this.headers.push(<th key={key}><Label>{key}</Label></th>);
+//         this.cells.push(<td key={key}>{ React.cloneElement(child, {label: undefined} ) }</td>);
+//       });
+//     } else {
+//       this.headers = <th style={{width:"100%"}}><Label>{this.props.children.props.label}</Label></th>;
+//       this.cells = <td>{ React.cloneElement(this.props.children, {label: undefined}) }</td>
+//     }
+    
+//     // state handling
+//     this.state={rows: [this.createRow(0)]}
+//     this.setRows = row =>this.setState({rows:row});
+//   }
+
+//   // function to delete its own row object (of input elements)
+//   // triggered by pressing the remove button
+//   async deleteRow(key){
+//     const tempRows = [...this.state.rows];
+//     const toDeleteIndex = tempRows.map(item=>item.key).indexOf(key);
+//     if (toDeleteIndex > -1){
+//       tempRows.splice(toDeleteIndex, 1);
+//     }
+//     this.setRows(tempRows);
+//   }
+
+//   // function to add a row object at the bottom of the Tabulator.
+//   // triggered by pressing add button
+//   async addRow(){
+//     const tempRows = [...this.state.rows];
+//     tempRows.push(this.createRow(Math.floor(Math.random()*100000)));
+//     this.setRows(tempRows);
+//   }
+
+//   // function to create a row object. row object contains a unique index called key 
+//   // and a HTML that will be rendered. the key is used to identify a row if need to delete 
+//   createRow(key){
+//     return {
+//       key:key,
+//       values: {},
+//       html: (
+//         <tr key={key}>
+//           {this.cells}
+//           <td>
+//             <MS.DefaultButton
+//               iconProps={{iconName: 'Remove'}}
+//               styles={{
+//                 root:{minWidth: "12px", padding:"0px 5px"},
+//                 rootHovered: {backgroundColor: "#d13438", color:"white"}
+//               }}
+//               onClick={()=>this.deleteRow(key)}
+//             />
+//           </td>
+//         </tr>
+//       )
+//     }
+//   }
+
+//   render(){
+//     return (
+//       <table style={{width:"100%"}}>
+//         <thead>
+//           <tr>
+//             {
+//               this.headers
+//             }
+//             <th></th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           {/* extract the HTML of every row object and display it */}
+//           {this.state.rows.map(row=>{
+//               return row.html;
+//             })
+//           }
+//           <tr>
+//             <td colSpan={this.headers.length}></td>
+//             <td>
+//               <MS.DefaultButton iconProps={{iconName: 'Add'}}
+//                 styles={{
+//                   root:{minWidth: "12px", padding:"0px 5px"},
+//                   rootHovered: {backgroundColor: pallete.two, color:"white"}
+//                 }}
+//                 onClick={()=>this.addRow()}
+//               />
+//             </td>
+//           </tr>
+//         </tbody>
+//       </table>
+//     )
+//   }
+// }

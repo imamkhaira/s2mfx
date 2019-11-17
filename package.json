@@ -30,5 +30,6 @@
   },
   "devDependencies": {
     "office-ui-fabric-react": "^7.47.0"
-  }
+  },
+  "homepage": "http://dev.s2m.online/PDS/SiteAssets/originator/"
 }

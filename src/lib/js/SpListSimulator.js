@@ -1,31 +1,33 @@
-class SpListSimulator{
-    constructor(GUID = ["id", "firstName", "lastName"]){
-        this.list = GUID;
-        this.cols = {};
-        SpListSimulator.currentUser = {id: 0, LoginName: 'the.batman', Title: 'The Dark Knight', Email: 'batman@gotham.gov', IsSiteAdmin: true};
-        GUID.forEach(item => {
-            const obj = {
-                dataName: item,
-                value: null,
-                setValue: (v)=>{obj.value = String(v)}
-            };
-            this.cols[item] = obj;
-        });        
+export class DataObj {
+    constructor(dataName, dispName = undefined, choiceValues = undefined, value = undefined){
+        this.dataName = dataName;
+        this.dispName = dispName;
+        this.choiceValues = choiceValues;
+        this.value = value;
+    }
+    setValue = v => { this.value = v }
+}
+
+const SpListSimulator = async properties => {
+    let listObj = {};
+    properties.forEach(element => {
+        listObj[element.dataName] = element;
+    });
+
+    listObj.submitAction = async () => {
+        let toSubmit = {};
+        for (const key in listObj) {
+            if (listObj[key].value) {
+                toSubmit[key] = listObj[key].value;
+                
+            }
+        }
+        alert('submit success');
+        console.log("submitted the following: ");
+        console.log(toSubmit);
     }
 
-    printInfo(){
-        console.table(this.cols);
-    }
-
-    submitAction = () =>{
-        let values = {};
-        for (const key in this.cols) {
-            if (this.cols[key].value) values[key] = this.cols[key].value;
-        };
-        alert(`Submit Successfull`);
-        console.log('Successfully sumbitted following data:');
-        console.log(values);   
-    }
+    return listObj;
 }
 
 export default SpListSimulator;
