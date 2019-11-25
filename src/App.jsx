@@ -2,7 +2,7 @@ import React from 'react';
 import logo from './lib/img/logo_eco.png';
 import {
   Box, Row, Col, Section, Textfield, Dropdown, Multiselect,
-  Datepicker, Tabulator, Radiobutton, Label
+  Datepicker, Tabulator, Radiobutton, Label, Subsection, Button, Pallete
 } from './components/Component';
 import Header from './components/Header';
 
@@ -19,89 +19,166 @@ class App extends React.Component {
     this.religion = ["Muslim", "Christian", "Buddhist", "Hindu", "Other"];
     this.marital = ["Single", "Married", "Divorced"];
     this.license = ["A", "A1", "B", "B1", "B2", "C", "D", "DA", "E", "E1", "E2", "F", "G", "H", "I", "M"];
-
   }
 
+  componentDidMount(){
+    let leftblank = document.getElementById("onetIDListForm");
+    if (leftblank) leftblank.style.width = "100%";
+  }
+ 
   render(){
-    const {
-      Title, Age, Citizenship, Correspondence_x0020_Address, Date_x0020_of_x0020_Birth, Designation,
-      Division, Full_x0020_Name, Gender, Marital_x0020_Status, NRIC_x0020_Current, NRIC_x0020_Old,
-      Permanent_x0020_Address, Race, Religion, Email_x0020_Address, Telephone_x0020_No,  Driving_x0020_License_x0020_Clas
-    } = window.personalInfo;
-    const { accountNo, bankName, bankBranch, bankSwift, incomeTaxNo, socsoNo, taxBranch, epfNo } = window.payroll;
+    const personalInfo = window.personalInfo;
+    const payroll = window.payroll;
+    const vehicle = window.vehicle;
+    const family = window.family;
+
     const setAge = newAge => this.setState({ age: Math.floor((Date.now() - Date.parse(newAge))/31557600000) });
     return (
       <Box>
         <Header title="SHAREPOINT CEWP PLAYGROUND" subtitle="ECOPRASINOS ENGINEERING SDN BHD" logo={logo} />
         {/* <br /> */}
-        <Section label="1. PERSONAL INFORMATION">
+        <Section label="1. PERSONAL INFORMATION" closed>
           <Row>
             <Col>
-              <Textfield label={Title.dispName} bindTo={Title} required />
-              <Textfield label={Full_x0020_Name.dispName} bindTo={Full_x0020_Name} />
-              <Textfield label={Designation.dispName} bindTo={Designation} />
-              <Radiobutton label={Division.dispName} bindTo={Division} options={Division.choiceValues} />
-              <Datepicker label="Date of Birth" bindTo={Date_x0020_of_x0020_Birth} getter={setAge}/>
+              <Textfield label={personalInfo.Title.dispName} bindTo={personalInfo.Title} required />
+              <Textfield label={personalInfo.Full_x0020_Name.dispName} bindTo={personalInfo.Full_x0020_Name} />
+              <Textfield label={personalInfo.Designation.dispName} bindTo={personalInfo.Designation} />
+              <Radiobutton label={personalInfo.Division.dispName} bindTo={personalInfo.Division} options={personalInfo.Division.choiceValues} />
+              <Datepicker label="Date of Birth" bindTo={personalInfo.Date_x0020_of_x0020_Birth} getter={setAge}/>
               {
                 this.state.age && (
                   <p>
                     <Label>Age (calculated) : {this.state.age} years old</Label>
-                    {Age.setValue(this.state.age)}
+                    { personalInfo.Age.setValue(this.state.age) }
                   </p>
                 )
               }
-              <Textfield label="NRIC/Passport (current)" bindTo={NRIC_x0020_Current} />
-              <Textfield label="NRIC/Passport (old)" bindTo={NRIC_x0020_Old} />
-              <Dropdown label={Citizenship.dispName} bindTo={Citizenship} options={Citizenship.choiceValues}/>
-              <Dropdown label={Race.dispName} bindTo={Race} options={Race.choiceValues} />
-              <Dropdown label={Religion.dispName} bindTo={this.state.religion==="Other"||Religion} options={Religion.choiceValues} getter={this.setReligion}/>
+              <Textfield label="NRIC/Passport (current)" bindTo={personalInfo.NRIC_x0020_Current} />
+              <Textfield label="NRIC/Passport (old)" bindTo={personalInfo.NRIC_x0020_Old} />
+              <Dropdown label={personalInfo.Citizenship.dispName} bindTo={personalInfo.Citizenship} options={personalInfo.Citizenship.choiceValues}/>
+              <Dropdown label={personalInfo.Race.dispName} bindTo={personalInfo.Race} options={personalInfo.Race.choiceValues} />
+              <Dropdown label={personalInfo.Religion.dispName} bindTo={this.state.religion==="Other"||personalInfo.Religion} options={personalInfo.Religion.choiceValues} getter={this.setReligion}/>
               {
-                this.state.religion==="Other" &&  <Textfield label="Enter Religion" bindTo={Religion} />
+                this.state.religion==="Other" &&  <Textfield label="Enter Religion" bindTo={personalInfo.Religion} />
               }
-              <Radiobutton label={Gender.dispName} bindTo={Gender} options={Gender.choiceValues} />              
+              <Radiobutton label={personalInfo.Gender.dispName} bindTo={personalInfo.Gender} options={personalInfo.Gender.choiceValues} />              
             </Col>
             <Col>
-              <Textfield label="Income Tax No" bindTo={incomeTaxNo} />
-              <Textfield label="Income tax Branch" bindTo={taxBranch} />
-              <Textfield label="SOCSO No" bindTo={socsoNo} />
-              <Textfield label="EPF No" bindTo={epfNo} />
-              <Radiobutton label={Marital_x0020_Status.dispName} bindTo={Marital_x0020_Status} options={Marital_x0020_Status.choiceValues} />
-              <Textfield label={Permanent_x0020_Address.dispName} bindTo={Permanent_x0020_Address} multiline />
-              <Textfield label={Correspondence_x0020_Address.dispName} bindTo={Correspondence_x0020_Address} multiline />
-              <Textfield label={Email_x0020_Address.dispName} bindTo={Email_x0020_Address} title="use , to separate multiple addresses"/>
-              <Textfield label={Telephone_x0020_No.dispName} bindTo={Telephone_x0020_No} />
-              {/*<Tabulator>
-                <Textfield label="Email Address" />
-              </Tabulator>
-              <Tabulator>
-                <Textfield label="Telephone No" />
-              </Tabulator> */}
-              <Multiselect label={Driving_x0020_License_x0020_Clas.dispName} bindTo={Driving_x0020_License_x0020_Clas} options={Driving_x0020_License_x0020_Clas.choiceValues} />
-              <Tabulator>
-                <Textfield label="Vehicle Brand/Type"  bindTo="brand"  />
-                <Textfield label="Reg. No" bindTo="regno" />
+              <Textfield label="Income Tax No" />
+              <Textfield label="Income tax Branch" />
+              <Textfield label="SOCSO No" />
+              <Textfield label="EPF No" />
+              <Radiobutton label={personalInfo.Marital_x0020_Status.dispName} bindTo={personalInfo.Marital_x0020_Status} options={personalInfo.Marital_x0020_Status.choiceValues} />
+              <Textfield label={personalInfo.Permanent_x0020_Address.dispName} bindTo={personalInfo.Permanent_x0020_Address} multiline />
+              <Textfield label={personalInfo.Correspondence_x0020_Address.dispName} bindTo={personalInfo.Correspondence_x0020_Address} multiline />
+              <Textfield label={personalInfo.Email_x0020_Address.dispName} bindTo={personalInfo.Email_x0020_Address} title="use , to separate multiple addresses"/>
+              <Textfield label={personalInfo.Telephone_x0020_No.dispName} bindTo={personalInfo.Telephone_x0020_No} />
+            
+              <Multiselect label={personalInfo.Driving_x0020_License_x0020_Clas.dispName} bindTo={personalInfo.Driving_x0020_License_x0020_Clas} options={personalInfo.Driving_x0020_License_x0020_Clas.choiceValues} />
+              <Tabulator bindList={window.vehicle} foreignKey={window.personalInfo.Title} fkColName="Title" label="Vehicle Information">
+                <Textfield label="Vehicle Brand/Type" bindTo="Brand"  />
+                <Textfield label="Reg. No" bindTo="Registration_x0020_No" />
               </Tabulator>
             </Col>
           </Row>
-          <br />
         </Section>
-        <Section label="2. BANK INFORMATION">
+
+        <Section label="2. BANK INFORMATION" closed>
           <Dropdown label="Bank Type" options={['Maybank', 'Other Bank']} getter={this.setBankname}/>
           { 
             (typeof(this.state.bankName) != "undefined") &&
             <>
-              <Textfield label="Account No" bindTo={accountNo} />
-              <Textfield label="Bank Name" bindTo={bankName} value={this.state.bankName ? 'Maybank Berhad': undefined} disabled={this.state.bankName} />
-              <Textfield label="Bank Branch" bindTo={bankBranch} />
-              <Textfield label="SWIFT Code" bindTo={bankSwift} value={this.state.bankName && 'MBBEMYKL'} disabled={this.state.bankName} />
+              <Textfield label="Account No" />
+              <Textfield label="Bank Name" value={this.state.bankName ? "Maybank": undefined} />
+              <Textfield label="Bank Branch" />
+              <Textfield label="SWIFT Code" value={this.state.bankName ? "MBBEMYKL": undefined} />
             </>
-          }<br />
+          }
         </Section>
-        <Section label="3. FAMILY INFORMATION">
 
+        <Section label="3. FAMILY BACKGROUND" closed>
+          <Subsection label="A. Spouse Information">
+          <Row>
+            <Col>
+              <Textfield label="Spouse Full Name" />
+              <Textfield label={family.Title.dispName} />
+              <Textfield label="Employment Status" />
+              
+              <Textfield label={family.Income_x0020_Tax_x0020_No.dispName} />
+              <Textfield label={family.Income_x0020_Tax_x0020_Branch.dispName} />
+            </Col>
+            <Col>
+              <Textfield label={family.Occupation.dispName} />
+              <Textfield label={family.Employment.dispName} />
+              <Textfield label={family.Employer_x0027_s_x0020_Address.dispName} />
+              <Textfield label={family.Email_x0020_Address.dispName} />
+              <Textfield label="Phone No." />
+            </Col>
+          </Row>
+          </Subsection>
+          <Tabulator bindList={window.family} foreignKey={window.personalInfo.Title} fkColName="Title" label="B. Children Details">
+            <Textfield label="Child Name" />
+            <Textfield label="Age" />
+            <Textfield label="Gender" />
+            <Textfield label="IC/Cert. No" />
+            <Textfield label="Fulltime Study" />
+          </Tabulator>
+          <Tabulator bindList={window.family} foreignKey={window.personalInfo.Title} fkColName="Title" label="C. Family Member Details" >
+            <Textfield label="Family Member Name" />
+            <Textfield label="Age" />
+            <Textfield label="Gender" />
+            <Textfield label="Education Level" />
+            <Textfield label="Occupation" />
+            <Textfield label="Employer" />
+          </Tabulator>
         </Section>
-        <button type="submit" onClick={()=>window.personalInfo.submitAction()}>Submit!</button>
-      </Box>        
+
+        <Section label="4. EMERGENCY CONTACT NUMBER">
+          <Tabulator bindList={window.family} foreignKey={window.personalInfo.Title} fkColName="Title">
+            <Textfield label="Name" />
+            <Textfield label="Relationship" />
+            <Textfield label="Address" />
+            <Textfield label="Telephone No" />
+            <Textfield label="Email Address" />
+          </Tabulator>
+        </Section>
+
+        <Section label="5. QUALIFICATIONS">
+          <Tabulator bindList={window.family} foreignKey={window.personalInfo.Title} fkColName="Title" label="A. Education Background">
+            <Textfield label="School/College/Institutions" />
+            <Textfield label="Obtained Certificate" />
+            <Textfield label="Major" />
+            <Textfield label="Year Start" />
+            <Textfield label="Year End" />
+            <Textfield label="Achievement" />
+          </Tabulator>
+          <Tabulator bindList={window.family} foreignKey={window.personalInfo.Title} fkColName="Title" label="B. Professional Membership">
+            <Textfield label="Membership/Accreditation" />
+            <Textfield label="Membership No" />
+            <Textfield label="Expiration date" />
+          </Tabulator>
+          <Tabulator bindList={window.family} foreignKey={window.personalInfo.Title} fkColName="Title" label="C. Employment History">
+            <Textfield label="Year Start" />
+            <Textfield label="Year End" />
+            <Textfield label="Employer" />
+            <Textfield label="Designation" />
+            <Textfield label="Salary" />
+            <Textfield label="Reason of leaving" />
+          </Tabulator>
+        </Section>
+        <br />
+        <Button type="button" 
+          onClick={()=>{
+            window.vehicle.submitAction(m=>alert(`success: ${m}`)); 
+          }}
+          text="Yahudi"
+          allowDisabledFocus
+          iconName="SharepointAppIcon16"
+          styles={{root:{width: "100%", border: `2px solid ${Pallete.primary}`, alignContent: "center"}, icon:{align: "center"}}}
+          />
+          <br />
+          <br />
+      </Box>
     );
   }
 }

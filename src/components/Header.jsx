@@ -1,14 +1,13 @@
 import React from 'react';
-import {Box, Row, Col} from './Component';
-
+import {Box, Row, Col, Pallete} from './Component';
 
 const Header = ({title, subtitle, logo})=>{
     const style = {
-        backgroundColor:"#064a90",
+        backgroundColor: Pallete.header,
         paddingLeft: '10px',
         paddingRight: '10px',
         color: '#ffffff',
-        border: '1px solid #064a90',
+        border: `1px solid ${Pallete.primary}`,
         lineHeight: '4px',
     };
 

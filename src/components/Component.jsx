@@ -5,12 +5,13 @@ import * as MS from 'office-ui-fabric-react';
 window.s2mfx = {};
 MS.initializeIcons();
 
-const pallete = window.pallete || {
-  one: '#818281',
-  two: '#064a90',
-  three: '#4778ac',
-  four: '#363636',
-  five: '#245f9d'
+export const Pallete = window.Pallete || {
+  header: '#067BC2', //dark green
+  primary: '#1E91D6', //light greeen
+  primary_alt: '#e0f4ff ', //lighter green
+  success: '#157A6E', //grreen?
+  warning: '#F3A712  ', //yellow
+  error: '#C14953' //very red
 };
 
 export const mobilecheck = () => {
@@ -31,18 +32,6 @@ const mapOptions = options => options.map(option=>{
     return option;
   }
 });
-
-export const Containerbase = (props) =>{
-  const style = {
-    border: props.border,   //w-s-c
-    background: props.bg,   //c-i-r-a-p
-    margin: props.margin,   //t-r-b-l, a space around this div
-    padding: props.pad      //t-r-b-l, a space inside this div
-  };
-
-  return props.children(props.style=style);
-}
-
 
 export const Resizeable = (func)=>{
   window.addEventListener('resize', ()=>{
@@ -74,17 +63,17 @@ export const Col = (props) => {
 
 
 export const Singlecol = props => (
-  <div className={`col-xs-12 ${props.options}`} style={props.style}>{props.children}</div>
+  <div className={`col-xs-12 ${props.options}`} {...props} >{props.children}</div>
 )
 
 
 export const Section = props => {
-  const [show, setShow] = React.useState(true);
+  const [show, setShow] = React.useState(!props.closed);
   const change = () => setShow(!show);
   const bordered = {
     padding: 'none',
     margin: 'none',
-    border: `1px solid ${pallete.five}`,
+    border: `1px solid ${show ? Pallete.primary : Pallete.header}`,
   };
   
   const inherit = {
@@ -92,19 +81,26 @@ export const Section = props => {
     width: '100%',
     backgroundColor: 'inherit',
     border: 'none',
-    textAlign: 'left',
-    padding: 'none'
+    textAlign: "left",
+    padding: '5px 5px 5px 5px'
   };
 
   return (
     <Row style={bordered}>
-      <Singlecol style={{backgroundColor: pallete.five}}>
-        <MS.DefaultButton styles={{root: inherit, rootHovered: inherit, rootPressed: inherit}} onClick={change}>
-        {props.label}
+      <Singlecol style={{backgroundColor: show ? Pallete.primary : Pallete.header}}>
+        <MS.DefaultButton
+          styles={{
+            root: inherit,
+            rootHovered: {...inherit, backgroundColor: show ? Pallete.header : Pallete.primary},
+            rootPressed: {...inherit, backgroundColor: Pallete.warning}
+          }}
+          onClick={change}>
+          {props.label}
         </MS.DefaultButton>
       </Singlecol>
-      <Singlecol style={{backgroundColor: '#ffffff'}}>
-        {show && props.children}
+      <Singlecol>
+        { show && props.children }
+        { show && <br /> }
       </Singlecol>
     </Row>
   );
@@ -114,7 +110,19 @@ export const Label = ({children, ...rest}) =>{
   return (<MS.Label {...rest} >{children}</MS.Label>);
 };
 
-const Binder = ({children, bindTo, varName, getter }) =>{
+export const Subsection = ({label, children, ...rest}) => {
+  return (
+    <>
+    <Label disabled>{label}</Label>
+    <Box style={{border: `1px solid ${Pallete.primary_alt}`, padding:"0px 5px 5px 5px"}}>
+      {children}
+    </Box> 
+    </>
+    
+  );
+}
+
+export const Textfield = ({bindTo, varName, getter, follow, ...rest}) =>{
   const handleInput = e =>{
     let value = e.target.value;
     if (typeof(getter) === 'function') getter(value);
@@ -122,43 +130,59 @@ const Binder = ({children, bindTo, varName, getter }) =>{
     if (typeof(varName) === 'string') window.s2mfx[varName] = value;
   }
 
-  return React.cloneElement(children, {onChange: handleInput})
-}
-
-
-export const Textfield = ({label, bindTo, varName, getter, ...rest}) =>{
   return (
-    <Binder bindTo={bindTo} varName={varName} getter={getter} >
-      <MS.TextField label={label} {...rest} />
-    </Binder>
+    <MS.TextField
+      {...rest}
+      onChange={handleInput}
+    />
   );
 }
 
+export const Checkbox = ({varName, getter, bindTo, ...rest})=>{
+  const handleInput = (event, check) => {
+    if (typeof(getter) === 'function') getter(check);
+    if (typeof(bindTo) === 'object') bindTo.setValue(check);
+    if (typeof(varName) === 'string') window.s2mfx[varName] = check;
+  };
+  return <MS.Checkbox onChange={handleInput} {...rest} />
+}
 
-export const Multiselect = ({label, getter, varName, bindTo, placeholder, options, ...rest}) => {
+export const Button = ({children, iconName, ...rest}) => {
+  return (
+  <MS.DefaultButton iconProps={{iconName: iconName}} {...rest} >
+    {children}
+  </MS.DefaultButton>
+  );
+}
+
+export const Multiselect = ({getter, varName, bindTo, placeholder, options, ...rest}) => {
   const [selection, setSelection] = React.useState([]);
+  const [text, setText] = React.useState([]);
   
   const optionsArray = mapOptions(options);
 
   const handleInput = (event, item)=>{
     const selectedItems = [...selection];
+    const selectedText = [...text];
     if (item.selected) {
       selectedItems.push(item.key); // add the option if it's checked
+      selectedText.push(item.text);
     } else {
       const currIndex = selectedItems.indexOf(item.key); // remove the option if it's unchecked
       if (currIndex > -1) {
         selectedItems.splice(currIndex, 1);
+        selectedText.splice(currIndex, 1);
       }
     }
     setSelection(selectedItems);
-    if (typeof(getter) === 'function') getter(selectedItems);
-    if (typeof(bindTo) === 'object') bindTo.setValue(selectedItems);
-    if (typeof(varName) === 'string') window.s2mfx[varName] = selectedItems;
+    setText(selectedText);
+    if (typeof(getter) === 'function') getter(selectedText);
+    if (typeof(bindTo) === 'object') bindTo.setValue(selectedText ? {results: selectedText} : null);
+    if (typeof(varName) === 'string') window.s2mfx[varName] = selectedText;
   }
 
   return (
     <MS.Dropdown
-      label={label}
       placeholder={placeholder || "Choose multiple..."}
       selectedKeys={selection}
       onChange={handleInput}
@@ -197,29 +221,15 @@ export const Dropdown = ({label, getter, varName, bindTo, placeholder, options, 
 
 
 export const Datepicker = ({label, getter, varName, bindTo, required}) =>{
-  const [date, setDate] = React.useState();
+  const [date, setDate] = React.useState(new Date("27 March 1996"));
 
   const handleInput = e =>{
-    setDate(e);
-    if (typeof(getter) === 'function') getter(new Date(e));
-    if (typeof(bindTo) === 'object') bindTo.setValue(new Date(e));
-    if (typeof(varName) === 'string') window.s2mfx[varName] = new Date(e);
+    const ayam = new Date(e);
+    if (typeof(getter) === 'function') getter(ayam);
+    if (typeof(bindTo) === 'object') bindTo.setValue(ayam);
+    if (typeof(varName) === 'string') window.s2mfx[varName] = ayam;
+    setDate(ayam);
   }
-
-  const DayPickerStrings = {
-    months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-    shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    shortDays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-    goToToday: 'Today',
-    prevMonthAriaLabel: 'Previous month',
-    nextMonthAriaLabel: 'Next month',
-    prevYearAriaLabel: 'Previous year',
-    nextYearAriaLabel: 'Next year',
-    closeButtonAriaLabel: 'Close date picker',
-    isRequiredErrorMessage: 'Start date is required.',
-    invalidInputErrorMessage: 'Invalid date format.'
-  };
 
   return (
     <MS.DatePicker
@@ -228,14 +238,11 @@ export const Datepicker = ({label, getter, varName, bindTo, required}) =>{
       ariaLabel={label}
       firstDayOfWeek={MS.DayOfWeek.Sunday}
       showMonthPickerAsOverlay={mobilecheck()}
-      strings={DayPickerStrings}
       value={date}
       onSelectDate={handleInput}
     />
   );
 }
-
-
 
 export const Radiobutton = ({label, options, bindTo, varName, getter, required, ...rest})=>{
   const optionsArray = mapOptions(options);
@@ -260,114 +267,120 @@ export const Radiobutton = ({label, options, bindTo, varName, getter, required, 
   );
 }
 
-
-export class Tabulator extends React.Component {
+export class Tabulator extends React.PureComponent{
+  // props: children, bindList: [], fkColName, foreignKey: dataObj
   constructor(props){
     super(props);
-    if (this.props.children.length > 1){
-      this.header = this.props.children.map(element =>{
-        return <th key={element.props.label}><Label>{element.props.label}</Label></th>;
+    try {
+      this.header = this.props.children.map(child=>{
+        return <th key={child.props.label} style={{fontWeight: "600"}}>{child.props.label}</th>;
       });
-    } else {
-      this.header = <th><Label>{this.props.children.props.label}</Label></th>;
+      this.state = { rows: {
+        html: [],
+        index: [],
+      } };
+      this.setRows = newRow =>this.setState({rows: newRow});
+      this.props.bindList.tabulator = [];
+    } catch (err) {
+      console.error("blyat tabbulator needs at least 2 columns");
     }
-
-    this.state = {rows: [this.createRow(0)]};
-    this.setRows = row =>this.setState({rows:row});
   }
 
-  createRow(index){
-    const data = {};
-    return {
-      key: index,
-      data: data,
-      html: 
+  componentDidMount(){
+    this.createRows(0);
+  }
+
+  createRows(index){
+    let data = {};
+    let temp = {
+      html: [...this.state.rows.html],
+      index: [...this.state.rows.index],
+    };
+    data[this.props.fkColName || "Title"] = this.props.foreignKey;
+    temp.index.push(index);
+    temp.html.push(
       <tr key={index}>
         {
-          (this.props.children.length > 1) ? this.props.children.map(element =>{
-            data[element.props.bindTo] = {
-              dataName: element.props.bindTo,
+          this.props.children.map(child=>{
+            data[child.props.bindTo] = {
+              dataName: child.props.bindTo,
               value: undefined,
-              setValue: v =>data[element.props.bindTo].value = String(v)
+              setValue: v => { data[child.props.bindTo].value = v }
             };
-            return <td key={element.props.label}>{React.cloneElement(element, {label: null, bindTo: data[element.props.bindTo] })}</td>;
-          }) : <td>{
-              React.cloneElement(this.props.children, {
-              label: null,
-              bindTo: data[this.props.children.props.bindTo]
-            })
-          }</td>
+            return (
+              <td key={child.props.bindTo}>
+                {React.cloneElement(child, { label: undefined, bindTo: data[child.props.bindTo] })}
+              </td>
+            );
+          })
         }
-        <td>
-          <MS.DefaultButton
-            iconProps={{iconName: 'Remove'}}
-            styles={{
-              root:{minWidth: "12px", padding:"0px 5px"},
-              rootHovered: {backgroundColor: "#d13438", color:"white"}
-            }}
-            onClick={()=>this.deleteRow(index)}
+        <td style={{width:'1em'}}>
+            <MS.IconButton
+              iconProps={{iconName: 'Remove'}}
+              styles={{
+                root:{border: `1px solid #d13438`, minWidth: "12px", padding:"0px 5px"},
+                rootHovered: {backgroundColor: "#d13438", color:"white"}
+              }}
+            onClick={()=>{this.deleteRow(index)}}
+            title="Remove this entry"
           />
         </td>
       </tr>
+    );
+    
+    
+    this.props.bindList.tabulator.push(data);
+    this.setRows(temp);
+  }
+
+  deleteRow(index){
+    let temp = {
+      html: [...this.state.rows.html],
+      index: [...this.state.rows.index]
+    };
+    let deleteindex = temp.index.indexOf(index);
+    if (deleteindex > -1 ) {
+      temp.html.splice(deleteindex, 1);
+      temp.index.splice(deleteindex, 1);
+      this.props.bindList.tabulator.splice(deleteindex, 1);
+      this.setRows(temp);
     }
-  }
-
-  // function to delete its own row object (of input elements)
-  // triggered by pressing the remove button
-  async deleteRow(key){
-    const tempRows = [...this.state.rows];
-    const toDeleteIndex = tempRows.map(item=>item.key).indexOf(key);
-    if (toDeleteIndex > -1){
-      tempRows.splice(toDeleteIndex, 1);
-    }
-    this.setRows(tempRows);
-  }
-
-  // function to add a row object at the bottom of the Tabulator.
-  // triggered by pressing add button
-  async addRow(){
-    const tempRows = [...this.state.rows];
-    tempRows.push(this.createRow(Math.floor(Math.random()*100000)));
-    this.setRows(tempRows);
-  }
-
-  submitAction(){
-    this.state.rows.forEach(element =>
-      console.log(element.data)
-    )
   }
 
   render(){
-    return (
-      <table style={{width:"100%"}}>
-        <thead>
-          <tr>
+    const { floor, random } = Math;   
+    const styling = {
+      table: { border: this.props.label && `1px solid ${Pallete.primary}`, width: "100%", textAlign: "center", marginTop: "8px" },
+      caption: { textAlign: "left" },
+      thead: { fontSize: "14px",  textAlign: "center", backgroundColor: Pallete.primary_alt }
+      //thead: { fontSize: "14px",  textAlign: "center", border: "1px solid #0B6FA4" }
+    };
+
+    return(
+      <table style={styling.table}>
+        {this.props.label && <caption style={styling.caption}><Label disabled>{this.props.label}</Label></caption>}
+        <thead style={styling.thead}>
+          <tr >
             {this.header}
-            <th></th>
+            <th>
+              <MS.IconButton iconProps={{iconName: 'Add'}}
+                styles={{
+                  root:{ border: `1px solid ${Pallete.success}`, width: "100%" },
+                  rootHovered: { backgroundColor: Pallete.success, color:"white" }
+                }}
+                onClick={()=>this.createRows(floor(random()*27031996))}
+                title="Add an entry"
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
-          {
-            /* extract the HTML of every row object and display it */
-            this.state.rows.map(element=>element.html)
-          }
+          {this.state.rows.html}
           <tr>
-            {/* <td colSpan={this.header.length}></td> */}
-            <td>
-            <MS.DefaultButton onClick={()=>this.submitAction()}>sabmit</MS.DefaultButton>
-            </td>
-            <td>
-              <MS.DefaultButton iconProps={{iconName: 'Add'}}
-                styles={{
-                  root:{minWidth: "12px", padding:"0px 5px"},
-                  rootHovered: {backgroundColor: pallete.two, color:"white"}
-                }}
-                onClick={()=>this.addRow()}
-              />
-            </td>
+            <td colSpan={this.header.length}></td>
           </tr>
         </tbody>
       </table>
-    )
+    );
   }
 }

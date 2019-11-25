@@ -24,11 +24,11 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>s2m framework</title>
     <script>
       if(window.SP){
         if(!window.sprLib){
-          console.log("ga ada cdn, using fallback to local server");
+          console.warn("ga ada cdn, using fallback to local server");
           document.write('<script src="%PUBLIC_URL%/static/js/MicrosoftAjax.js">\x3C/script>');
         }
       } else {console.log("not deployed in sharepoint yet?");}
