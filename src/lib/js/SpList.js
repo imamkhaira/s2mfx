@@ -10,7 +10,8 @@ const SpList = async GUID => {
         listObj[column.dataName] = column;
     });
 
-    listObj.submitAction = async (doOnSuccess = undefined) => {
+    listObj.submitAction = async () => {
+        let result = {};
         if (listObj.tabulator){
             for (const rows of listObj.tabulator) {
                 let toSubmit = {};
@@ -19,10 +20,10 @@ const SpList = async GUID => {
                         toSubmit[key] = rows[key].value;
                     }
                 }
-                const result = await list.create(toSubmit);
+                result = await list.create(toSubmit);
                 console.log(result);
             }
-            if (typeof(doOnSuccess)=== "function") { doOnSuccess("cek lah sendiri"); }
+            return Promise.resolve(result);
         }
         else {
             let toSubmit = {};
@@ -32,12 +33,13 @@ const SpList = async GUID => {
                 }
             }
             try {
-                const result = await list.create(toSubmit);
-                if (typeof(doOnSuccess)=== "function") { doOnSuccess(result); }
+                result = await list.create(toSubmit);
                 console.log(`SUCCESS submit with message:`, result);
+                return Promise.resolve(result);
             } catch (error) {
                 alert("failed to submit, check message");
                 console.error(`failed to submit:`, error);
+                return Promise.reject(result);
             }
         }
     }
@@ -46,8 +48,9 @@ const SpList = async GUID => {
         let dataname = [];
         let dataObj = [];
         columns.forEach(element=>{
+            const {dataName, dispName, choiceValues} = element;
             dataname.push(element.dataName);
-            dataObj.push(`new DataObj("${element.dataName}", "${element.dispName}"), ${element.choiceValues ? "//choices": ""}`);
+            dataObj.push(`new DataObj("${dataName}", "${dispName}"), ${choiceValues ? `//choice   ` : ''}`);
         });
         console.table(columns);
         console.log(dataname);
@@ -57,4 +60,6 @@ const SpList = async GUID => {
     return listObj;
 }
 
+// sprLib.baseUrl('/PDS/');
+// const b = await SpList("a07c5f04-151f-4b39-ba21-6e392c4903b1");
 export default SpList;

@@ -15,7 +15,7 @@ const Header = ({title, subtitle, logo})=>{
     <Row style={style} options="middle-xs between-md around-xs">
         <Col>
             <Box options="center-xs start-sm hidden-xs show-sm" >
-                <img src={logo} alt={title} height="70px" />
+                
             </Box>
         </Col>
         <Col>

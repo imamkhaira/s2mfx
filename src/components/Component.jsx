@@ -14,6 +14,16 @@ export const Pallete = window.Pallete || {
   error: '#C14953' //very red
 };
 
+export const setSiteContentUrl = (href) => {
+  if (window.s2mfx_debug|| !window.SP){
+    window.openSiteContent = function(){
+      let location = href;
+      window.location.replace(location);
+    }
+  }
+}
+
+
 export const mobilecheck = () => {
   var check = false;
   // eslint-disable-next-line
@@ -45,25 +55,62 @@ export const Resizeable = (func)=>{
   });
 }
 
+export class FormWrapper extends React.PureComponent {
+  constructor(props){
+    super(props)
+    this.formid = MS.getId(Math.random());
+    this.inputID = MS.getId(Math.random());
+  }
 
-export const Box = props => (
+
+  componentDidMount(){
+    const { onSubmit } = this.props;
+    document.getElementById(this.formid).addEventListener('submit', (event) => {
+      event.preventDefault();
+      const valid = document.getElementById(this.formid).checkValidity();
+      if (valid){
+        onSubmit();
+      }
+      else {
+        document.getElementById(this.inputID).click();
+      }
+    });
+  }
+
+  render() {
+    const { children } = this.props;
+    return (
+      <>
+      <form name={this.formid} id={this.formid}>
+        {children}
+        <br />
+        <input type="submit" id={this.inputID} style={{opacity: '0'}} />
+      </form>                                                                                     
+      </>
+    );
+  }
+}
+
+export const Box = props => {
   // box options
-  <div className={`box ${props.options}`} style={props.style} {...props} >{props.children}</div>
-);
+  return (
+    <div className={`box ${props.options ? props.options : "" }`} style={props.style} {...props} >{props.children}</div>
+  );
+};
 
 
 export const Row = props =>(
-  <div className={`row ${props.options}`} style={props.style}>{props.children}</div>
+  <div className={`row ${props.options ? props.options : "" }`} style={props.style}>{props.children}</div>
 );
 
 
 export const Col = (props) => {
-  return <div className={`col-xs-12 col-sm-6 ${props.options}`} style={props.style}>{props.children}</div>;
+  return <div className={`col-xs-12 col-sm-6 ${props.options ? props.options : "" }`} style={props.style}>{props.children}</div>;
 };
 
 
 export const Singlecol = props => (
-  <div className={`col-xs-12 ${props.options}`} {...props} >{props.children}</div>
+  <div className={`col-xs-12 ${props.options ? props.options : "" }`} {...props} >{props.children}</div>
 )
 
 
@@ -118,8 +165,15 @@ export const Subsection = ({label, children, ...rest}) => {
       {children}
     </Box> 
     </>
-    
   );
+}
+
+export const Tooltip = ({children, id, calloutProps, ...rest}) => {
+  const _id = MS.getId(String(id));
+  const _calloutProps = calloutProps || { gapSpace: -25 };
+  const _tooltipProps= { style: { overflowY: 'auto' } };
+  const _children = React.cloneElement(children, {'aria-describedby': _id});
+  return <MS.TooltipHost id={_id} calloutProps={_calloutProps} tooltipProps={_tooltipProps} {...rest}>{_children}</MS.TooltipHost>;
 }
 
 export const Textfield = ({bindTo, varName, getter, follow, ...rest}) =>{
@@ -183,7 +237,7 @@ export const Multiselect = ({getter, varName, bindTo, placeholder, options, ...r
 
   return (
     <MS.Dropdown
-      placeholder={placeholder || "Choose multiple..."}
+      placeholder={placeholder || "Choose..."}
       selectedKeys={selection}
       onChange={handleInput}
       multiSelect
@@ -211,7 +265,7 @@ export const Dropdown = ({label, getter, varName, bindTo, placeholder, options, 
       label={label}
       selectedKey={selection ? selection.key : undefined}
       onChange={handleInput}
-      placeholder={placeholder || "Select an option..."}
+      placeholder={placeholder || "Select..."}
       options={optionsArray}
       styles={{ dropdown: { width: "100%" } }}
       {...rest}
@@ -267,13 +321,45 @@ export const Radiobutton = ({label, options, bindTo, varName, getter, required, 
   );
 }
 
+export const Fileupload = ({label, bindTo, getter, varName, fileName, getFileAddr, required, ...rest}) =>{
+  let [filename, setFilename] = React.useState("Add File");
+  let file = new FileReader();
+  const handleInput = async event =>{
+    const open = event.target.files[0];
+    setFilename(open.name);
+    const extension = open.name.split('.');
+    const name = `${fileName.value}.${extension[extension.length-1]}`;
+    
+    file.readAsArrayBuffer(open);
+    file.onloadend = (e) => {  
+      const result = e.target.result;
+      if (typeof(getter) === 'function') getter(name, result);
+      if (typeof(varName) === 'string') window.s2mfx[varName] = [name, result];
+      if (typeof(bindTo) === 'object') { 
+        bindTo.uploadObj.setName(name);
+        bindTo.uploadObj.setData(result);
+      }
+    }
+  
+  }
+  const id = MS.getId(String(label));
+  const click = () => document.getElementById(id).click();
+  return (
+    <div>
+      <MS.Label>{`${label}${required ? " *" : ""}`}</MS.Label>
+      <MS.CommandButton iconProps={{ iconName: 'Add' }} text={filename} onClick={click}/>
+      <input id={id} type="file" onChange={handleInput} {...rest} style={{display: "none"}}/>
+    </div>
+  );
+}
+
 export class Tabulator extends React.PureComponent{
   // props: children, bindList: [], fkColName, foreignKey: dataObj
   constructor(props){
     super(props);
     try {
       this.header = this.props.children.map(child=>{
-        return <th key={child.props.label} style={{fontWeight: "600"}}>{child.props.label}</th>;
+        return <th key={child.props.label} style={{fontWeight: "600", width: child.props.width || null}}>{child.props.label}</th>;
       });
       this.state = { rows: {
         html: [],
@@ -308,7 +394,7 @@ export class Tabulator extends React.PureComponent{
               setValue: v => { data[child.props.bindTo].value = v }
             };
             return (
-              <td key={child.props.bindTo}>
+              <td key={child.props.label}>
                 {React.cloneElement(child, { label: undefined, bindTo: data[child.props.bindTo] })}
               </td>
             );
@@ -357,16 +443,26 @@ export class Tabulator extends React.PureComponent{
     };
 
     return(
+      <div style={{overflowX:"auto"}}>
       <table style={styling.table}>
         {this.props.label && <caption style={styling.caption}><Label disabled>{this.props.label}</Label></caption>}
         <thead style={styling.thead}>
           <tr >
             {this.header}
             <th>
-              <MS.IconButton iconProps={{iconName: 'Add'}}
+              {/* <MS.IconButton iconProps={{iconName: 'Add'}}
                 styles={{
                   root:{ border: `1px solid ${Pallete.success}`, width: "100%" },
                   rootHovered: { backgroundColor: Pallete.success, color:"white" }
+                }}
+                onClick={()=>this.createRows(floor(random()*27031996))}
+                title="Add an entry"
+              /> */}
+              <MS.IconButton
+                iconProps={{iconName: 'Add'}}
+                styles={{
+                  root:{border: `1px solid ${Pallete.success}`, minWidth: "12px", padding:"0px 5px"},
+                  rootHovered: {backgroundColor: Pallete.success, color:"white"}
                 }}
                 onClick={()=>this.createRows(floor(random()*27031996))}
                 title="Add an entry"
@@ -381,6 +477,7 @@ export class Tabulator extends React.PureComponent{
           </tr>
         </tbody>
       </table>
+      </div>
     );
   }
 }
