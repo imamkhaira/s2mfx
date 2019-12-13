@@ -67,7 +67,8 @@ export class FormWrapper extends React.PureComponent {
     const { onSubmit } = this.props;
     document.getElementById(this.formid).addEventListener('submit', (event) => {
       event.preventDefault();
-      const valid = document.getElementById(this.formid).checkValidity();
+      const form = document.getElementById(this.formid);
+      const valid = form.checkValidity();
       if (valid){
         onSubmit();
       }

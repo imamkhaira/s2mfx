@@ -43,7 +43,11 @@ class App extends React.Component {
       .then( ()=>payroll.submitAction() )
       .then( ()=>vehicle.submitAction() )
       .then( ()=>family.submitAction() )
-      .then( (m)=>{alert(`success fully submitted`); console.log(m)} )
+      .then( ()=>emergency.submitAction() )
+      .then( ()=>education.submitAction() )
+      .then( ()=>professional.submitAction() )
+      .then( ()=>employment.submitAction() )
+      .then( (m)=>{alert(`successfully submitted`); console.log(m)} )
       .catch( (m)=>{alert(`fail to submitted`); console.log(m)});
       }}>
         <Header title="PERSONNEL DATA SHEET FORM" subtitle="Human Resources Division" logo={logo} />
@@ -51,11 +55,11 @@ class App extends React.Component {
         <Section label="1. PERSONAL INFORMATION">
           <Row>
             <Col>
-              <Textfield label={personalInfo.Title.dispName} bindTo={personalInfo.Title} getter={setPrimaryKey} required/>
-              <Textfield label={personalInfo.Full_x0020_Name.dispName} bindTo={personalInfo.Full_x0020_Name}  />
-              <Textfield label={personalInfo.Designation.dispName} bindTo={personalInfo.Designation}  />
-              <Radiobutton label={personalInfo.Division.dispName} bindTo={personalInfo.Division} options={personalInfo.Division.choiceValues}  />
-              <Datepicker label="Date of Birth" bindTo={personalInfo.Date_x0020_of_x0020_Birth} getter={setAge}/>
+              <Textfield label={personalInfo.Title.dispName} bindTo={personalInfo.Title} getter={setPrimaryKey} required />
+              <Textfield label={personalInfo.Full_x0020_Name.dispName} bindTo={personalInfo.Full_x0020_Name} required />
+              <Textfield label={personalInfo.Designation.dispName} bindTo={personalInfo.Designation} required />
+              <Radiobutton label={personalInfo.Division.dispName} bindTo={personalInfo.Division} options={personalInfo.Division.choiceValues} required />
+              <Datepicker label="Date of Birth" bindTo={personalInfo.Date_x0020_of_x0020_Birth} getter={setAge} required />
               {
                 this.state.age && (
                   <p>
@@ -64,19 +68,19 @@ class App extends React.Component {
                   </p>
                 )
               }
-              <Textfield label="NRIC/Passport (current)" bindTo={personalInfo.NRIC_x0020__x002f__x0020_Passpor}  />
+              <Textfield label="NRIC/Passport (current)" bindTo={personalInfo.NRIC_x0020__x002f__x0020_Passpor} required />
               <Textfield label="NRIC/Passport (old)"  />
-              <Dropdown label={personalInfo.Citizenship.dispName} bindTo={personalInfo.Citizenship} options={personalInfo.Citizenship.choiceValues} />
-              <Dropdown label={personalInfo.Race.dispName} bindTo={personalInfo.Race} options={personalInfo.Race.choiceValues}  />
-              <Dropdown label={personalInfo.Religion.dispName} bindTo={personalInfo.Religion} options={personalInfo.Religion.choiceValues} />
-              <Radiobutton label={personalInfo.Gender.dispName} bindTo={personalInfo.Gender} options={personalInfo.Gender.choiceValues}  />
-              <Fileupload label="Upload Picture" bindTo={folder} fileName={personalInfo.Title} getter={(x,y)=>setFileName(x)}  />
+              <Dropdown label={personalInfo.Citizenship.dispName} bindTo={personalInfo.Citizenship} options={personalInfo.Citizenship.choiceValues} required />
+              <Dropdown label={personalInfo.Race.dispName} bindTo={personalInfo.Race} options={personalInfo.Race.choiceValues} required />
+              <Dropdown label={personalInfo.Religion.dispName} bindTo={personalInfo.Religion} options={personalInfo.Religion.choiceValues} required />
+              <Radiobutton label={personalInfo.Gender.dispName} bindTo={personalInfo.Gender} options={personalInfo.Gender.choiceValues} required />
+              <Fileupload label="Upload Picture" bindTo={folder} fileName={personalInfo.Title} getter={(x,y)=>setFileName(x)} required />
             </Col>
             <Col>
-              <Textfield label={payroll.Income_x0020_Tax_x0020_No.dispName} bindTo={payroll.Income_x0020_Tax_x0020_No} />
-              <Textfield label={payroll.Income_x0020_Tax_x0020_Branch.dispName} bindTo={payroll.Income_x0020_Tax_x0020_Branch} />
-              <Textfield label={payroll.SOCSO_x0020_No.dispName} bindTo={payroll.SOCSO_x0020_No} />
-              <Textfield label={payroll.EPF_x0020_No.dispName} bindTo={payroll.EPF_x0020_No} />
+              <Textfield label={payroll.Income_x0020_Tax_x0020_No.dispName} bindTo={payroll.Income_x0020_Tax_x0020_No} required />
+              <Textfield label={payroll.Income_x0020_Tax_x0020_Branch.dispName} bindTo={payroll.Income_x0020_Tax_x0020_Branch} required />
+              <Textfield label={payroll.SOCSO_x0020_No.dispName} bindTo={payroll.SOCSO_x0020_No} required />
+              <Textfield label={payroll.EPF_x0020_No.dispName} bindTo={payroll.EPF_x0020_No} required />
               <Radiobutton label={personalInfo.Marital_x0020_Status.dispName} bindTo={personalInfo.Marital_x0020_Status} options={personalInfo.Marital_x0020_Status.choiceValues}  />
               <Textfield label={personalInfo.Permanent_x0020_Address.dispName} bindTo={personalInfo.Permanent_x0020_Address} multiline  />
               <Textfield label={personalInfo.Correspondence_x0020_Address.dispName} bindTo={personalInfo.Correspondence_x0020_Address} multiline />
@@ -152,7 +156,7 @@ class App extends React.Component {
           </Tabulator>
         </Section>
         <br />
-        <button type="submit">asdasdasdad</button>
+        <button type="submit">Submit</button>
       </FormWrapper>
     );
   }
