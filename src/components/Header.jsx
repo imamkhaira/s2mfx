@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, Row, Col, Pallete} from './Component';
 
-const Header = ({title, subtitle, logo})=>{
+const Header = ({title, subtitle, logo, logoWidth="170"})=>{
     const style = {
         backgroundColor: Pallete.header,
         paddingLeft: '10px',
@@ -15,7 +15,7 @@ const Header = ({title, subtitle, logo})=>{
     <Row style={style} options="middle-xs between-md around-xs">
         <Col>
             <Box options="center-xs start-sm hidden-xs show-sm" >
-                
+               {logo && <img src={logo} alt={subtitle} width={logoWidth} />}
             </Box>
         </Col>
         <Col>

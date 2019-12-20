@@ -29,7 +29,7 @@ class App extends React.Component {
   }
  
   render(){
-    const {personalInfo, payroll, vehicle, family, folder, emergency, education, professional, employment} = window;
+    const {personalInfo, payroll, vehicle, family, folder, emergency, education, professional, employment} = window.SPSite;
     const setPrimaryKey = key => {
       payroll.Title.setValue(key);
     };
@@ -81,13 +81,13 @@ class App extends React.Component {
               <Textfield label={payroll.Income_x0020_Tax_x0020_Branch.dispName} bindTo={payroll.Income_x0020_Tax_x0020_Branch} required />
               <Textfield label={payroll.SOCSO_x0020_No.dispName} bindTo={payroll.SOCSO_x0020_No} required />
               <Textfield label={payroll.EPF_x0020_No.dispName} bindTo={payroll.EPF_x0020_No} required />
-              <Radiobutton label={personalInfo.Marital_x0020_Status.dispName} bindTo={personalInfo.Marital_x0020_Status} options={personalInfo.Marital_x0020_Status.choiceValues}  />
-              <Textfield label={personalInfo.Permanent_x0020_Address.dispName} bindTo={personalInfo.Permanent_x0020_Address} multiline  />
+              <Radiobutton label={personalInfo.Marital_x0020_Status.dispName} bindTo={personalInfo.Marital_x0020_Status} options={personalInfo.Marital_x0020_Status.choiceValues} required />
+              <Textfield label={personalInfo.Permanent_x0020_Address.dispName} bindTo={personalInfo.Permanent_x0020_Address} multiline required />
               <Textfield label={personalInfo.Correspondence_x0020_Address.dispName} bindTo={personalInfo.Correspondence_x0020_Address} multiline />
               <Textfield label={personalInfo.Email_x0020_Address.dispName} bindTo={personalInfo.Email_x0020_Address} title="use , to separate multiple addresses" />
               <Textfield label={personalInfo.Telephone_x0020_No.dispName} bindTo={personalInfo.Telephone_x0020_No}  />
               <Multiselect label={personalInfo.Driving_x0020_License_x0020_Clas.dispName} bindTo={personalInfo.Driving_x0020_License_x0020_Clas} options={personalInfo.Driving_x0020_License_x0020_Clas.choiceValues} />
-              <Tabulator bindList={vehicle} foreignKey={window.personalInfo.Title} fkColName="Title" label="Vehicle Information">
+              <Tabulator bindList={vehicle} foreignKey={personalInfo.Title} fkColName="Title" label="Vehicle Information">
                 <Textfield label="Vehicle Brand/Type" bindTo="Brand_x0020__x0026__x0020_Type"  />
                 <Textfield label="Reg. No" bindTo="Registration_x0020_No" />
                 <Dropdown label="Type" bindTo="Vehicle_x0020_Type" options={vehicle.Vehicle_x0020_Type.choiceValues} />
@@ -105,7 +105,7 @@ class App extends React.Component {
 
         <Section label="3. FAMILY INFORMATION">
           <p>Fill in the details of your core family member, including parents and siblings.</p>
-          <Tabulator bindList={family} foreignKey={window.personalInfo.Title} fkColName="Title" >
+          <Tabulator bindList={family} foreignKey={personalInfo.Title} fkColName="Title" >
             <Dropdown label={family.Relationship.dispName} bindTo="Relationship" options={family.Relationship.choiceValues} />
             <Textfield label={family.Family_x0020_Member_x0020_Name.dispName} bindTo="Family_x0020_Member_x0020_Name" />
             <Dropdown label={family.Gender.dispName} bindTo="Gender" options={family.Gender.choiceValues} />
@@ -118,7 +118,7 @@ class App extends React.Component {
         </Section>
 
         <Section label="4. EMERGENCY CONTACT INFORMATION">
-          <Tabulator bindList={emergency} foreignKey={window.personalInfo.Title} fkColName="Title" >
+          <Tabulator bindList={emergency} foreignKey={personalInfo.Title} fkColName="Title" >
             <Textfield label={emergency.Contact_x0020_Name.dispName} bindTo="Contact_x0020_Name" />
             <Dropdown label={emergency.Relationship.dispName} bindTo="Gender" options={emergency.Relationship.choiceValues} />
             <Textfield label={emergency.Contact_x0020_Address.dispName} bindTo="Contact_x0020_Address" />
@@ -128,7 +128,7 @@ class App extends React.Component {
         </Section>
 
         <Section label="5. EDUCATION BACKGROUND">
-          <Tabulator bindList={education} foreignKey={window.personalInfo.Title} fkColName="Title" >
+          <Tabulator bindList={education} foreignKey={personalInfo.Title} fkColName="Title" >
             <Textfield label="School/College/Institution" bindTo="Institution" />
             <Textfield label={education.Year_x0020_Start.dispName} bindTo="Year_x0020_Start" />
             <Textfield label={education.Year_x0020_End.dispName} bindTo="Year_x0020_End" />
@@ -139,14 +139,14 @@ class App extends React.Component {
         </Section>
 
         <Section label="6. PROFESSIONAL MEMBERSHIP">
-          <Tabulator bindList={professional} foreignKey={window.personalInfo.Title} fkColName="Title" >
+          <Tabulator bindList={professional} foreignKey={personalInfo.Title} fkColName="Title" >
             <Textfield label={professional.Membership_x0020__x002f__x0020_A.dispName} bindTo="Membership_x0020__x002f__x0020_A" />
             <Textfield label={professional.Registration_x0020_No.dispName} bindTo="Registration_x0020_No" />
             <Textfield label={professional.Expiration_x0020_Date.dispName} bindTo="Expiration_x0020_Date" />
           </Tabulator>
         </Section>
         <Section label="7. EMPLOYMENT HISTORY">
-          <Tabulator bindList={professional} foreignKey={window.personalInfo.Title} fkColName="Title" >
+          <Tabulator bindList={professional} foreignKey={personalInfo.Title} fkColName="Title" >
             <Textfield label={employment.Date_x0020_Start.dispName} bindTo="Date_x0020_Start" />
             <Textfield label={employment.Date_x0020_Enf.dispName} bindTo="Date_x0020_Enf" />
             <Textfield label={employment.Designation.dispName} bindTo="Designation" />

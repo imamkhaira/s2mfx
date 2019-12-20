@@ -86,7 +86,7 @@ export class FormWrapper extends React.PureComponent {
         {children}
         <br />
         <input type="submit" id={this.inputID} style={{opacity: '0'}} />
-      </form>                                                                                     
+      </form>
       </>
     );
   }
@@ -275,8 +275,8 @@ export const Dropdown = ({label, getter, varName, bindTo, placeholder, options, 
 }
 
 
-export const Datepicker = ({label, getter, varName, bindTo, required}) =>{
-  const [date, setDate] = React.useState(new Date("27 March 1996"));
+export const Datepicker = ({label, getter, varName, bindTo, required, placeholder=(new Date("27 March 2020"))}) =>{
+  const [date, setDate] = React.useState(placeholder);
 
   const handleInput = e =>{
     const ayam = new Date(e);
@@ -325,24 +325,25 @@ export const Radiobutton = ({label, options, bindTo, varName, getter, required, 
 export const Fileupload = ({label, bindTo, getter, varName, fileName, getFileAddr, required, ...rest}) =>{
   let [filename, setFilename] = React.useState("Add File");
   let file = new FileReader();
-  const handleInput = async event =>{
+
+  const handleInput = event =>{
     const open = event.target.files[0];
     setFilename(open.name);
     const extension = open.name.split('.');
-    const name = `${fileName.value}.${extension[extension.length-1]}`;
-    
+    const name = `${fileName.value || extension[0]}.${extension[extension.length-1]}`;
     file.readAsArrayBuffer(open);
-    file.onloadend = (e) => {  
+
+    file.onloadend = (e) => {
       const result = e.target.result;
-      if (typeof(getter) === 'function') getter(name, result);
-      if (typeof(varName) === 'string') window.s2mfx[varName] = [name, result];
-      if (typeof(bindTo) === 'object') { 
-        bindTo.uploadObj.setName(name);
-        bindTo.uploadObj.setData(result);
+      if (typeof(getter) === 'function') getter(encodeURI(name), result);
+      if (typeof(varName) === 'string') window.s2mfx[varName] = [encodeURI(name), result];
+      if (typeof(bindTo) === 'object') {
+        bindTo.setName(name);
+        bindTo.setData(result);
       }
     }
-  
   }
+
   const id = MS.getId(String(label));
   const click = () => document.getElementById(id).click();
   return (
@@ -394,6 +395,7 @@ export class Tabulator extends React.PureComponent{
               value: undefined,
               setValue: v => { data[child.props.bindTo].value = v }
             };
+
             return (
               <td key={child.props.label}>
                 {React.cloneElement(child, { label: undefined, bindTo: data[child.props.bindTo] })}
