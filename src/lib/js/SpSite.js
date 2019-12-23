@@ -254,7 +254,7 @@ class SpSite {
         }
     }
 
-    async submitAll(){
+    submitAll(){
         let loadedList = [];
         for (const lists in window.SPSite) {
             if (window.SPSite.hasOwnProperty(lists)) loadedList.push(window.SPSite[lists].submitAction());
