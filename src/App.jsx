@@ -33,7 +33,7 @@ class App extends React.Component {
     const setPrimaryKey = key => {
       payroll.Title.setValue(key);
     };
-    const setFileName = n => {personalInfo.Picture.setValue(`${window.location.origin}/PDS/ProfilePicture/${n}`); console.log(personalInfo.Picture.value);};
+    const setFileName = n => {personalInfo.Picture.setValue(`${window.location.origin}/sites/Administration/ProfilePicture/${n}`); console.log(personalInfo.Picture.value);};
     const setAge = newAge => this.setState({ age: Math.floor((Date.now() - Date.parse(newAge))/31557600000) });
     
     
@@ -50,8 +50,8 @@ class App extends React.Component {
         .then( () => employment.submitAction() )
         .then( () => folder.submitAction() )
 
-        .then( (m)=>{alert(`successfully submitted`); console.log(m)} )
-        .catch( (m)=>{alert(`fail to submitted`); console.log(m)});
+        .then( (m)=>{alert(`successfully submitted`); window.location.href = "https://epehr.s2m.online/sites/Administration/Pages/Staff/Registration.aspx"} )
+        .catch( (m)=>{alert(`fail to submitted`); console.warn("part that fail: ", m)});
       }}>
         <Header title="PERSONNEL DATA SHEET FORM" subtitle="Human Resources Division" logo={logo} />
         {/* <br /> */}
@@ -123,7 +123,7 @@ class App extends React.Component {
         <Section label="4. EMERGENCY CONTACT INFORMATION">
           <Tabulator bindList={emergency} foreignKey={personalInfo.Title} fkColName="Title" >
             <Textfield label={emergency.Contact_x0020_Name.dispName} bindTo="Contact_x0020_Name" />
-            <Dropdown label={emergency.Relationship.dispName} bindTo="Gender" options={emergency.Relationship.choiceValues} />
+            <Dropdown label={emergency.Relationship.dispName} bindTo="Relationship" options={emergency.Relationship.choiceValues} />
             <Textfield label={emergency.Contact_x0020_Address.dispName} bindTo="Contact_x0020_Address" />
             <Textfield label={emergency.Telephone_x0020_No.dispName} bindTo="Telephone_x0020_No" />
             <Textfield label={emergency.Email_x0020_Address.dispName} bindTo="Email_x0020_Address" />

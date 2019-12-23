@@ -114,11 +114,26 @@ async function SpList(varName, listName, dataObjects=[], url) {
         try {
             if (columns.tabulator) {
                 let temp = [];
+
                 for (const row of columns.tabulator) {
-                    if (Object.entries(row).length > 0) temp.push(list.create(row));
+                    let toSubmit = {};
+
+                    for (const dataName in row) {
+                        if (row[dataName].hasOwnProperty("value")){
+                            const {value} = row[dataName];
+                            if (value) toSubmit[dataName] = value;
+                        }
+                    }
+                    if (Object.keys(toSubmit).length > 1) {
+                        if (!sp) console.log("Tosubmit Length: ", Object.keys(toSubmit).length);
+                        temp.push( list.create(toSubmit) );
+                    }
+                    
+                    
                 }
                 return Promise.all(temp);
-           } else {
+
+            } else {
                 let result = await list.create(toSubmit);
                 return Promise.resolve(result);
             }
@@ -181,7 +196,7 @@ async function SpFile(varName, address, prefix) {
     };
     
     spFolder.submitAction = async () => {
-        if (createFile.hasOwnProperty("data")) {
+        if (createFile.data) {
             try {
                 let result = await spFolder.upload(createFile);
                 return Promise.resolve(result);
@@ -190,7 +205,7 @@ async function SpFile(varName, address, prefix) {
                 return Promise.reject(err);
             }
         } else {
-            return Promise.resolve(null);
+            return Promise.resolve("-no file selected-");
         }
     };
 
