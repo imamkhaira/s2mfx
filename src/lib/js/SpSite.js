@@ -7,6 +7,7 @@ const sp = window.SP ? true : false;
 
 
 /* ==================================== Column ========================================== */
+/* ====================================================================================== */
 
 
 /**
@@ -28,6 +29,7 @@ export function Column (dataName, dispName, choiceValues=null) {
 
 
 /* ==================================== SPList ========================================== */
+/* ====================================================================================== */
 
 
 /**
@@ -38,65 +40,43 @@ export function Column (dataName, dispName, choiceValues=null) {
  * @param {Array} dataObjects (null) an array of Column objects
  * @returns {Promise}
  */
-export async function SpList(varName, listName, dataObjects=[], url=webServerRelativeUrl) {
-    let [ columns, list, cols ] = [ {}, {}, undefined ];
+async function SpList(varName, listName, dataObjects=[], url) {
+    let columns = {};
+    let list = {};
+    let cols = {};
 
-    columns.tabulator = undefined;
-
+    // if sharepoint is detected, load real list and current user information.
+    // if not in sharepoint, create fake objects that imitates list function and user data.
     if (sp){
-        // if sharepoint is detected, load real list and current user information
-        list = sprLib.list({
-            name: listName,
-            baseUrl: url,
-        });
-        window.user = {
-            id: userId,
-            loginName: userLoginName,
-            email: userEmail,
-            dispName: userDisplayName
+        try {
+            list = sprLib.list({ name: listName, baseUrl: url });
+            cols = await list.cols();
+        } catch (error) {
+            return Promise.reject(`CANNOT FIND LIST ${listName}`);
         };
     } else {
-        // if not in sharepoint, create fake objects that imitates list function and user data.
         list = {
-            cols: () => Promise.resolve(dataObjects),
-            create: (data) => Promise.resolve(data)
+            cols: async () => Promise.resolve(dataObjects),
+            create: async (data) => { console.log(`Submit ${listName}:`, data); return Promise.resolve(data); },
         };
-        window.user = {
-            id: 6969,
-            loginName: "BROMELAYU\\batman",
-            email: "bromelayu@mail.com",
-            dispName: "The Batman"
-        };
-    }
-
-    try {
-        // try to get the columns, if the list exist
         cols = await list.cols();
-    } catch (error) {
-        // if list not exist, exit function immediately
-        return Promise.reject(`CANNOT FIND LIST ${listName}`);
-    };
-
+    }
+    
     // maps each Column object from Sharepoint
     // then give it a value & setValue properties
     cols.forEach( (column) => {
-        const { isReadOnly } = column;
-        column.value = undefined;
-        column.setValue = (value) => {
-            column.value = value;
-            if (sp) console.log(column.value);
-        };
-        if (!isReadOnly) columns[column.dataName] = column;
+        if (!column.isReadOnly) {
+            column.value = undefined;
+            column.setValue = (value) => {
+                column.value = value;
+                if (!sp) console.log(column.value);
+            };
+            columns[column.dataName] = column;
+        }
+        
     });
 
-    /**
-     * find a row in a list that mathced the filter.
-     * @date 2019-12-19
-     * @param {String} filter OData-style filter. MUST USE ``
-     * @param {String} queryOrderby (undefined) column to order the query result
-     * @param {Number} queryLimit (undefined) limit of result to be returned
-     * @returns {Array} array containing the result
-     */
+    // find a row that matches the filter param
     columns.find = async (filter, queryOrderby=undefined, queryLimit=undefined) => {
         try {
             let result = await list.items({
@@ -111,13 +91,7 @@ export async function SpList(varName, listName, dataObjects=[], url=webServerRel
         }
     };
 
-    /**
-     * update a record with ID that matches the supplied ID
-     * @date 2019-12-19
-     * @param {String} id the id of the row to be updated
-     * @param {Object} data an object with at least one dataName: value prop
-     * @returns {Object} updated Column item
-     */
+    // update a row that matches the id param with the data param
     columns.update = async (id, data) => {
         try {
             let result = await list.update({ ID: id, ...data });
@@ -128,58 +102,64 @@ export async function SpList(varName, listName, dataObjects=[], url=webServerRel
         }
     }
 
-    /**
-     * submit every data in this object property to SharePoint
-     * @date 2019-12-19
-     * @returns {Promise} success, failed
-     */
     columns.submitAction = async () => {
         let toSubmit = {};
-        if (columns.tabulator){
-            columns.tabulator.forEach( row => {
-                
-            });
-        }
-
+        
         for (const dataName in columns) {
-            let { value } = columns[dataName];
-            if (value) toSubmit[dataName] = columns[dataName].value;
+            if (typeof(columns[dataName]) === "object") {
+                if (columns[dataName].value) toSubmit[dataName] = columns[dataName].value;
+            }
+            
         }
-
         try {
-            let result = await list.create(toSubmit);
-            console.log("SUCCESSFULLY SUBMITTED");
-            return Promise.resolve(result);
+            if (columns.tabulator) {
+                let temp = [];
+                for (const row of columns.tabulator) {
+                    if (Object.entries(row).length > 0) temp.push(list.create(row));
+                }
+                return Promise.all(temp);
+           } else {
+                let result = await list.create(toSubmit);
+                return Promise.resolve(result);
+            }
         } catch (err) {
-            console.error("FAILED SUBMITTED");
+            console.error("CANNOT CREATE LIST ITEM");
             return Promise.reject(err);
         }
     };
     
+    columns.tabulator = undefined;
     columns.varName = varName;
     return Promise.resolve(columns);
 }
 
 
-/* ==================================== SPFile ========================================== */
+/* ===================================== SPFile ========================================== */
+/* ======================================================================================= */
 
 
 /**
- * create ain interface to connect to sharepoint document library
+ * create an interface to connect to sharepoint document library
  * @date 2019-12-20
  * @param {String} varName a global variable name to be assigned
  * @param {String} address relative url of the folder
  * @param {String} prefix (undefined) the prefix to be added to uploaded file name
  * @returns {any}
  */
-export async function SpFile(varName, address, prefix = undefined) {
-    let spFolder = {};
+async function SpFile(varName, address, prefix) {
+    let spFolder = undefined;
 
     if (sp) {
-        spFolder = sprLib.folder(String(address));
+        try{
+            spFolder = sprLib.folder(String(address));
+            await spFolder.info();
+        } catch (err) {
+            console.error("CANNOT OPEN FOLDER");
+            return Promise.reject(err);
+        }
     } else {
         spFolder = {
-            upload: async (filedata) => Promise.resolve(filedata),
+            upload: async (filedata) => { console.log(`Submit Folder ${varName}:`, filedata); return Promise.resolve(filedata);},
             info: async () => Promise.resolve("Pretending that the folder exist")
         }
     };
@@ -201,45 +181,55 @@ export async function SpFile(varName, address, prefix = undefined) {
     };
     
     spFolder.submitAction = async () => {
-        try {
-            let result = await spFolder.upload(createFile);
-            return Promise.resolve(result);
-        } catch (err) {
-            console.error("CANNOT UPLOAD FILE");
-            return Promise.reject(err);
+        if (createFile.hasOwnProperty("data")) {
+            try {
+                let result = await spFolder.upload(createFile);
+                return Promise.resolve(result);
+            } catch (err) {
+                console.error("CANNOT UPLOAD FILE");
+                return Promise.reject(err);
+            }
+        } else {
+            return Promise.resolve(null);
         }
     };
 
     spFolder.createFile = createFile;
     spFolder.varName = varName;
-    
-    try{
-        await spFolder.info();
-        return Promise.resolve(spFolder);
-    } catch (err) {
-        console.error("CANNOT OPEN FOLDER");
-        return Promise.reject(err);
-    }
+    return Promise.resolve(spFolder);
 }
 
 
 /* ==================================== SPSite ========================================== */
+/* ====================================================================================== */
 
 
 class SpSite {
     constructor(url=webServerRelativeUrl){
+        this.listPromises = [];
+        this.url = url;
+        sprLib.baseUrl(this.url);
+        
+        window.user = {
+            id: userId || 6969,
+            loginName: userLoginName || "the.batman",
+            email: userEmail || "batman@gotham.gov",
+            dispName: userDisplayName || "The Batman"
+        };
         window.SPSite = {};
-        sprLib.baseUrl(url);
-        this.listArray = undefined;
     }
     
-    load(SPListArray){
-        this.listArray = SPListArray;
+    loadList(varName, listName, dataObjects){
+        return this.listPromises.push( SpList(varName, listName, dataObjects, this.url) );
+    }
+
+    loadFolder(varName, address, prefix=undefined){
+        return this.listPromises.push( SpFile(varName, address, prefix) );
     }
 
     async ready(){
         try {
-            let result = await Promise.all(this.listArray);
+            let result = await Promise.all(this.listPromises);
             result.forEach( (list) =>{
                 window.SPSite[list.varName] = list;
             })
@@ -249,6 +239,7 @@ class SpSite {
             return Promise.reject(err);
         }
     }
+
 }
 
 export default SpSite;

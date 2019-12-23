@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/sites/Administration/SiteAssets/personnel-datasheet/originator/precache-manifest.5291e63bdd91f39332781db18dac61f6.js"
+  "/sites/Administration/SiteAssets/personnel-datasheet/originator/precache-manifest.d00ece24cad669be9eaff240d885fc22.js"
 );
 
 self.addEventListener('message', (event) => {
@@ -35,5 +35,5 @@ workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 workbox.routing.registerNavigationRoute(workbox.precaching.getCacheKeyForURL("/sites/Administration/SiteAssets/personnel-datasheet/originator/index.html"), {
   
-  blacklist: [/^\/_/,/\/[^\/?]+\.[^\/]+$/],
+  blacklist: [/^\/_/,/\/[^/?]+\.[^/]+$/],
 });

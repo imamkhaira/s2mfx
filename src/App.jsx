@@ -29,26 +29,29 @@ class App extends React.Component {
   }
  
   render(){
-    const {personalInfo, payroll, vehicle, family, folder, emergency, education, professional, employment} = window.SPSite;
+    const { personalInfo, payroll, vehicle, family, emergency, education, professional, employment, folder } = window.SPSite;
     const setPrimaryKey = key => {
       payroll.Title.setValue(key);
     };
     const setFileName = n => {personalInfo.Picture.setValue(`${window.location.origin}/PDS/ProfilePicture/${n}`); console.log(personalInfo.Picture.value);};
     const setAge = newAge => this.setState({ age: Math.floor((Date.now() - Date.parse(newAge))/31557600000) });
+    
+    
 
     return (
       <FormWrapper onSubmit={()=>{
-        personalInfo.submitAction()
-      .then( ()=>folder.submitAction() )
-      .then( ()=>payroll.submitAction() )
-      .then( ()=>vehicle.submitAction() )
-      .then( ()=>family.submitAction() )
-      .then( ()=>emergency.submitAction() )
-      .then( ()=>education.submitAction() )
-      .then( ()=>professional.submitAction() )
-      .then( ()=>employment.submitAction() )
-      .then( (m)=>{alert(`successfully submitted`); console.log(m)} )
-      .catch( (m)=>{alert(`fail to submitted`); console.log(m)});
+        personalInfo.submitAction() 
+        .then( () => payroll.submitAction() )
+        .then( () => vehicle.submitAction() )
+        .then( () => family.submitAction() )
+        .then( () => emergency.submitAction() )
+        .then( () => education.submitAction() )
+        .then( () => professional.submitAction() )
+        .then( () => employment.submitAction() )
+        .then( () => folder.submitAction() )
+
+        .then( (m)=>{alert(`successfully submitted`); console.log(m)} )
+        .catch( (m)=>{alert(`fail to submitted`); console.log(m)});
       }}>
         <Header title="PERSONNEL DATA SHEET FORM" subtitle="Human Resources Division" logo={logo} />
         {/* <br /> */}
@@ -56,10 +59,10 @@ class App extends React.Component {
           <Row>
             <Col>
               <Textfield label={personalInfo.Title.dispName} bindTo={personalInfo.Title} getter={setPrimaryKey} required />
-              <Textfield label={personalInfo.Full_x0020_Name.dispName} bindTo={personalInfo.Full_x0020_Name} required />
-              <Textfield label={personalInfo.Designation.dispName} bindTo={personalInfo.Designation} required />
-              <Radiobutton label={personalInfo.Division.dispName} bindTo={personalInfo.Division} options={personalInfo.Division.choiceValues} required />
-              <Datepicker label="Date of Birth" bindTo={personalInfo.Date_x0020_of_x0020_Birth} getter={setAge} required />
+              <Textfield label={personalInfo.Full_x0020_Name.dispName} bindTo={personalInfo.Full_x0020_Name} />
+              <Textfield label={personalInfo.Designation.dispName} bindTo={personalInfo.Designation} />
+              <Radiobutton label={personalInfo.Division.dispName} bindTo={personalInfo.Division} options={personalInfo.Division.choiceValues} />
+              <Datepicker label="Date of Birth" bindTo={personalInfo.Date_x0020_of_x0020_Birth} getter={setAge} />
               {
                 this.state.age && (
                   <p>
@@ -68,21 +71,21 @@ class App extends React.Component {
                   </p>
                 )
               }
-              <Textfield label="NRIC/Passport (current)" bindTo={personalInfo.NRIC_x0020__x002f__x0020_Passpor} required />
+              <Textfield label="NRIC/Passport (current)" bindTo={personalInfo.NRIC_x0020__x002f__x0020_Passpor} />
               <Textfield label="NRIC/Passport (old)"  />
-              <Dropdown label={personalInfo.Citizenship.dispName} bindTo={personalInfo.Citizenship} options={personalInfo.Citizenship.choiceValues} required />
-              <Dropdown label={personalInfo.Race.dispName} bindTo={personalInfo.Race} options={personalInfo.Race.choiceValues} required />
-              <Dropdown label={personalInfo.Religion.dispName} bindTo={personalInfo.Religion} options={personalInfo.Religion.choiceValues} required />
-              <Radiobutton label={personalInfo.Gender.dispName} bindTo={personalInfo.Gender} options={personalInfo.Gender.choiceValues} required />
-              <Fileupload label="Upload Picture" bindTo={folder} fileName={personalInfo.Title} getter={(x,y)=>setFileName(x)} required />
+              <Dropdown label={personalInfo.Citizenship.dispName} bindTo={personalInfo.Citizenship} options={personalInfo.Citizenship.choiceValues} />
+              <Dropdown label={personalInfo.Race.dispName} bindTo={personalInfo.Race} options={personalInfo.Race.choiceValues} />
+              <Dropdown label={personalInfo.Religion.dispName} bindTo={personalInfo.Religion} options={personalInfo.Religion.choiceValues}/>
+              <Radiobutton label={personalInfo.Gender.dispName} bindTo={personalInfo.Gender} options={personalInfo.Gender.choiceValues} />
+              <Fileupload label="Upload Picture" bindTo={folder} fileName={personalInfo.Title} getter={(x,y)=>setFileName(x)} />
             </Col>
             <Col>
-              <Textfield label={payroll.Income_x0020_Tax_x0020_No.dispName} bindTo={payroll.Income_x0020_Tax_x0020_No} required />
-              <Textfield label={payroll.Income_x0020_Tax_x0020_Branch.dispName} bindTo={payroll.Income_x0020_Tax_x0020_Branch} required />
-              <Textfield label={payroll.SOCSO_x0020_No.dispName} bindTo={payroll.SOCSO_x0020_No} required />
-              <Textfield label={payroll.EPF_x0020_No.dispName} bindTo={payroll.EPF_x0020_No} required />
-              <Radiobutton label={personalInfo.Marital_x0020_Status.dispName} bindTo={personalInfo.Marital_x0020_Status} options={personalInfo.Marital_x0020_Status.choiceValues} required />
-              <Textfield label={personalInfo.Permanent_x0020_Address.dispName} bindTo={personalInfo.Permanent_x0020_Address} multiline required />
+              <Textfield label={payroll.Income_x0020_Tax_x0020_No.dispName} bindTo={payroll.Income_x0020_Tax_x0020_No} />
+              <Textfield label={payroll.Income_x0020_Tax_x0020_Branch.dispName} bindTo={payroll.Income_x0020_Tax_x0020_Branch}  />
+              <Textfield label={payroll.SOCSO_x0020_No.dispName} bindTo={payroll.SOCSO_x0020_No} />
+              <Textfield label={payroll.EPF_x0020_No.dispName} bindTo={payroll.EPF_x0020_No} />
+              <Radiobutton label={personalInfo.Marital_x0020_Status.dispName} bindTo={personalInfo.Marital_x0020_Status} options={personalInfo.Marital_x0020_Status.choiceValues} />
+              <Textfield label={personalInfo.Permanent_x0020_Address.dispName} bindTo={personalInfo.Permanent_x0020_Address} multiline />
               <Textfield label={personalInfo.Correspondence_x0020_Address.dispName} bindTo={personalInfo.Correspondence_x0020_Address} multiline />
               <Textfield label={personalInfo.Email_x0020_Address.dispName} bindTo={personalInfo.Email_x0020_Address} title="use , to separate multiple addresses" />
               <Textfield label={personalInfo.Telephone_x0020_No.dispName} bindTo={personalInfo.Telephone_x0020_No}  />
@@ -146,11 +149,11 @@ class App extends React.Component {
           </Tabulator>
         </Section>
         <Section label="7. EMPLOYMENT HISTORY">
-          <Tabulator bindList={professional} foreignKey={personalInfo.Title} fkColName="Title" >
+          <Tabulator bindList={employment} foreignKey={personalInfo.Title} fkColName="Title" >
+            <Textfield label={employment.Employer.dispName} bindTo="Employer" />
+            <Textfield label={employment.Designation.dispName} bindTo="Designation" />
             <Textfield label={employment.Date_x0020_Start.dispName} bindTo="Date_x0020_Start" />
             <Textfield label={employment.Date_x0020_Enf.dispName} bindTo="Date_x0020_Enf" />
-            <Textfield label={employment.Designation.dispName} bindTo="Designation" />
-            <Textfield label={employment.Employer.dispName} bindTo="Employer" />
             <Textfield label={employment.Salary.dispName} bindTo="Salary" />
             <Textfield label={employment.Reason_x0020_of_x0020_Leaving.dispName} bindTo="Reason_x0020_of_x0020_Leaving" />
           </Tabulator>

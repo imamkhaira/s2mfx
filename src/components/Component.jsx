@@ -252,23 +252,35 @@ export const Multiselect = ({getter, varName, bindTo, placeholder, options, ...r
 
 export const Dropdown = ({label, getter, varName, bindTo, placeholder, options, ...rest}) => {
   const [selection, setSelection] = React.useState();
-  const optionsArray = mapOptions(options);
+  const [optionsArray, setOptionsArray] = React.useState(mapOptions(options));
 
-  const handleInput = (event, item)=>{
-    setSelection(item);
-    if (typeof(getter) === 'function') getter(item.text);
-    if (typeof(bindTo) === 'object') bindTo.setValue(item.text);
-    if (typeof(varName) === 'string') window.s2mfx[varName] = item.text;
-  }
+  const handleInput = (event, option, index, value) => {
+    let returnValue = undefined;
+
+    if (option) { // User chose an existing option
+      setSelection(option.key);
+      returnValue = option.text;
+    } else if (value !== undefined) { // User typed a new option
+      const newOption = { key: value.replace(/[^a-zA-Z0-9]/g, ""), text: value };
+      setOptionsArray([...optionsArray, newOption]);
+      setSelection(newOption.key);
+      returnValue = newOption.text;
+    }
+
+    if (typeof(getter) === 'function') getter(returnValue);
+    if (typeof(bindTo) === 'object') bindTo.setValue(returnValue);
+    if (typeof(varName) === 'string') window.s2mfx[varName] = returnValue;
+  };
 
   return (
-    <MS.Dropdown
+    <MS.ComboBox
       label={label}
-      selectedKey={selection ? selection.key : undefined}
-      onChange={handleInput}
       placeholder={placeholder || "Select..."}
+      selectedKey={selection}
       options={optionsArray}
-      styles={{ dropdown: { width: "100%" } }}
+      dropdownWidth="25%"
+      dropdownMaxWidth="50%"
+      onChange={handleInput}
       {...rest}
     />
   );
