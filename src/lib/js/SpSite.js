@@ -221,7 +221,6 @@ async function SpFile(varName, address, prefix) {
 
 class SpSite {
     constructor(url=webServerRelativeUrl){
-        this.listPromises = [];
         this.url = url;
         sprLib.baseUrl(this.url);
         
@@ -253,6 +252,14 @@ class SpSite {
             console.error("FAILED TO COMMUNICATE WITH SHAREPOINT SERVER");
             return Promise.reject(err);
         }
+    }
+
+    async submitAll(){
+        let loadedList = [];
+        for (const lists in window.SPSite) {
+            if (window.SPSite.hasOwnProperty(lists)) loadedList.push(window.SPSite[lists].submitAction());
+        }
+        return Promise.all(loadedList);
     }
 
 }
